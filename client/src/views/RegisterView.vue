@@ -14,7 +14,7 @@
               <input type="password" placeholder="Enter your password" v-model="passwordValue">
               <p class="error" :class="passwordClass">{{passwordErrorMsg}}</p>
             </div>
-            <button type="submit" @submit="submitForm($event)">Signup</button>
+            <button type="submit">Signup</button>
           </div>
         </form>
         <p>Already have an account? <router-link to="/login">Login</router-link></p>
