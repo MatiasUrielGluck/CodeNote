@@ -1,9 +1,12 @@
 const mongoose = require('mongoose')
 const noteModel = require('./model')
+const folderModel = require('../folders/model')
 
 module.exports = {
-    async getNotes() {
-        return await noteModel.find().populate('parentFolder')
+    async getNotes(folderId) {
+        return await noteModel.find({
+            parentFolder: folderId
+        })
         .then(res => {
             return res
         })
@@ -13,7 +16,7 @@ module.exports = {
     },
 
     async getNote(id) {
-        return await noteModel.findById(id).populate('parentFolder')
+        return await noteModel.findById(id)
         .then(res => {
             return res
         })
@@ -22,13 +25,16 @@ module.exports = {
         })
     },
     
-    async createNote(parentFolderId, name, content) {
+    async createNote(parentFolderId, name) {
         const newNote = await noteModel({
             name: name,
-            content: content,
+            content: '',
             parentFolder: parentFolderId
         })
 
+        const folder = await folderModel.findById(parentFolderId)
+        folder.notes.push(newNote._id)
+        await folder.save()
         return newNote.save()
         .then(res => {
             return res
@@ -51,7 +57,11 @@ module.exports = {
         })
     },
 
-    async deleteNote(id) {
+    async deleteNote(parentFolderId, id) {
+        const folder = await folderModel.findById(parentFolderId)
+        folder.notes.splice(folder.notes.find(element => element === id), 1)
+        await folder.save()
+
         return noteModel.findByIdAndDelete(id)
         .then(res => {
             return res

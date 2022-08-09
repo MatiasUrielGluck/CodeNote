@@ -10,6 +10,7 @@ const LocalStrategy = require('passport-local')
 const User = require('./apiServices/users/model')
 
 const usersRoutes = require('./apiServices/users/routes')
+const foldersRoutes = require('./apiServices/folders/routes')
 
 // Basic middlewares
 app.use(cors({
@@ -34,7 +35,7 @@ passport.deserializeUser(User.deserializeUser())
 
 // Routes middlewares
 app.use('/users', usersRoutes)
-// app.use('/folders', foldersRoutes)
+app.use('/folders', foldersRoutes)
 
 // ====================
 app.listen(config.port, () => {

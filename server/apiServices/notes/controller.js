@@ -2,7 +2,8 @@ const noteDao = require('./dao')
 
 module.exports = {
     async getNotes(req, res) {
-        const notes = await noteDao.getNotes()
+        const { folderId } = req.params
+        const notes = await noteDao.getNotes(folderId)
         res.send(JSON.stringify(notes))
     },
 
@@ -29,7 +30,8 @@ module.exports = {
 
     async deleteNote(req, res) {
         const { noteId } = req.params
-        const note = await noteDao.deleteNote(noteId)
+        const { folderId } = req.params
+        const note = await noteDao.deleteNote(folderId, noteId)
         res.send(JSON.stringify(note))
     }
 }

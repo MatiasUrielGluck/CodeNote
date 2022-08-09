@@ -17,7 +17,7 @@
       <div class="new-folder-window">
         <h1>New folder</h1>
         <input type="text" placeholder="Enter the folder name here" v-model="newFolderName">
-        <p :class="showError">Please, enter a folder name</p>
+        <p :class="showError">{{noteWindowError}}</p>
         <div class="action-container">
           <button @click="createFolder()">Create</button>
           <button @click="toggleFolderWindow()">Cancel</button>
@@ -30,7 +30,7 @@
       <div class="new-folder-window">
         <h1>New note</h1>
         <input type="text" placeholder="Enter the note name here" v-model="newNoteName">
-        <p :class="showError">Please, enter a note name</p>
+        <p :class="showError">{{noteWindowError}}</p>
         <div class="action-container">
           <button @click="createNote()">Create</button>
           <button @click="toggleNoteWindow()">Cancel</button>
@@ -133,7 +133,8 @@
 <script>
 import store from '@/store'
 // @ is an alias to /src
-import foldersApi from '../services/folderApi'
+import foldersApi from '../services/foldersApi'
+import notesApi from '../services/notesApi'
 
 export default {
   name: 'HomeView',
@@ -150,6 +151,7 @@ export default {
       hiddenFolderWindow: 'hidden-window',
       newFolderName: '',
       showError: '',
+      noteWindowError: 'Please, enter a folder name',
       hiddenNoteWindow: 'hidden-window',
       newNoteName: '',
       hiddenDeleteWindow: 'hidden-window',
@@ -159,7 +161,8 @@ export default {
   },
 
   async beforeMount() {
-    store.state.folders = await foldersApi.getFolders()
+    let res = await foldersApi.getFolders()
+    store.state.folders = res.data
     this.folders = store.state.folders
     document.querySelector('#foreColor').value = '#ffffff'
   },
@@ -178,6 +181,13 @@ export default {
   },
 
   methods: {
+    async getData() {
+      let res = await foldersApi.getFolders()
+      res = await foldersApi.getFolders() // getFolders again to force the Api retrive the correct data
+      store.state.folders = res.data
+      this.folders = store.state.folders
+    },
+
     resize() {
       if (window.innerWidth <= 1050) {
         this.showCloseBtn = true
@@ -260,6 +270,7 @@ export default {
     },
 
     toggleNoteWindow() {
+      this.showError = ''
       if (this.hiddenNoteWindow === '') {
         this.hiddenNoteWindow = 'hidden-window'
         this.newNoteName = ''
@@ -269,31 +280,55 @@ export default {
     },
 
     deleteItem() {
+      if (this.selectedDeleteItemType === 'folder') {
+        foldersApi.deleteFolder(this.selectedDeleteItem._id)
 
+      } else if (this.selectedDeleteItemType === 'note') {
+        console.log('delete the note here')
+      }
+
+      this.getData()
+      this.toggleDeleteWindow()
     },
 
-    createFolder() {
+    async createFolder() {
       if (!this.newFolderName) {
         this.showError = 'error'
         return
       } else {
+        // Conect to the backend to create the new folder
+        await foldersApi.createFolder({
+          name: this.newFolderName
+        })
+
         this.showError = ''
         this.newFolderName = ''
+        this.getData()
+        this.toggleFolderWindow()
       }
-
-      // Conect to the backend to create the new folder
     },
 
-    createNote() {
-      if (!this.newNoteName) {
+    async createNote() {
+      if (!this.selectedFolder) {
+        this.noteWindowError = 'Select a folder first'
+        this.showError = 'error'
+        return
+      }
+      else if (!this.newNoteName) {
+        this.noteWindowError = 'Please, enter a folder name'
         this.showError = 'error'
         return
       } else {
+        // Conect to the backend to create the new note
+        await notesApi.createNote(this.selectedFolder._id, {
+          name: this.newNoteName
+        })
+
         this.showError = ''
         this.newNoteName = ''
+        this.getData()
+        this.toggleNoteWindow()
       }
-
-      // Conect to the backend to create the new note
     }
   }
 }

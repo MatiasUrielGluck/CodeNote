@@ -2,7 +2,9 @@ const folderDao = require('./dao')
 
 module.exports = {
     async getFolders(req, res) {
-        const folders = await folderDao.getFolders()
+        const userId = req.user._id
+        if (!userId) { res.sendStatus(401) }
+        const folders = await folderDao.getFolders(userId)
         res.send(JSON.stringify(folders))
     },
 
@@ -14,7 +16,9 @@ module.exports = {
     
     async createFolder(req, res) {
         const { name } = req.body
-        const folder = await folderDao.createFolder(name)
+        const userId = req.user._id
+        if (!userId) { res.sendStatus(401) }
+        const folder = await folderDao.createFolder(userId, name)
         res.send(JSON.stringify(folder))
     },
     
@@ -27,7 +31,9 @@ module.exports = {
 
     async deleteFolder(req, res) {
         const { folderId } = req.params
-        const folder = await folderDao.deleteFolder(folderId)
+        const userId = req.user._id
+        if (!userId) { res.sendStatus(401) }
+        const folder = await folderDao.deleteFolder(userId, folderId)
         res.send(JSON.stringify(folder))
     }
 }

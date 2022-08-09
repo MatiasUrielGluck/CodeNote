@@ -4,7 +4,7 @@ const router = express.Router({mergeParams: true})
 const foldersRoutes = require('../folders/routes')
 const passport = require('passport')
 
-router.use('/:userId/folders', foldersRoutes)
+// router.use('/:userId/folders', foldersRoutes)
 
 router.post('/', controller.createUser)
 
