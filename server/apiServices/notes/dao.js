@@ -28,14 +28,15 @@ module.exports = {
     async createNote(parentFolderId, name) {
         const newNote = await noteModel({
             name: name,
-            content: '',
+            content: `<h1>${name}</h1>`,
             parentFolder: parentFolderId
         })
 
         const folder = await folderModel.findById(parentFolderId)
         folder.notes.push(newNote._id)
         await folder.save()
-        return newNote.save()
+        
+        return await newNote.save()
         .then(res => {
             return res
         })

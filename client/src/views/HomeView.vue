@@ -320,13 +320,13 @@ export default {
         return
       } else {
         // Conect to the backend to create the new note
-        await notesApi.createNote(this.selectedFolder._id, {
+        const newNote = await notesApi.createNote(this.selectedFolder._id, {
           name: this.newNoteName
         })
 
         this.showError = ''
         this.newNoteName = ''
-        this.getData()
+        this.notes.push(newNote.data)
         this.toggleNoteWindow()
       }
     }
