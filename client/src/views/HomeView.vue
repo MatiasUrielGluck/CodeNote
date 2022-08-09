@@ -279,12 +279,19 @@ export default {
       }
     },
 
-    deleteItem() {
+    async deleteItem() {
       if (this.selectedDeleteItemType === 'folder') {
-        foldersApi.deleteFolder(this.selectedDeleteItem._id)
+        await foldersApi.deleteFolder(this.selectedDeleteItem._id)
 
       } else if (this.selectedDeleteItemType === 'note') {
-        console.log('delete the note here')
+        await notesApi.deleteNote(this.selectedFolder._id, this.selectedDeleteItem._id)
+
+        // seleccionar la carpeta y la nota nuevamente
+        await this.getData()
+        this.selectedFolder = this.folders.find(folder => folder.name === this.selectedFolder.name)
+        this.selectNote(this.selectedFolder)
+        this.toggleDeleteWindow()
+        return
       }
 
       this.getData()

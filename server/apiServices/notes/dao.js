@@ -60,7 +60,14 @@ module.exports = {
 
     async deleteNote(parentFolderId, id) {
         const folder = await folderModel.findById(parentFolderId)
-        folder.notes.splice(folder.notes.find(element => element === id), 1)
+        // folder.notes.splice(folder.notes.find(element => element.equals(id)), 1)
+        let newNotesList = []
+        for (const note of folder.notes) {
+            if (!note.equals(id)) {
+                newNotesList.push(note)
+            }
+        }
+        folder.notes = newNotesList
         await folder.save()
 
         return noteModel.findByIdAndDelete(id)

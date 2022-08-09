@@ -21,8 +21,8 @@ export default {
         })
     },
 
-    deleteNote: async function(id) {
-        return await Api().delete('/' + id)
+    deleteNote: async function(folderId, id) {
+        return await Api().delete('/' + folderId + '/notes/' + id)
         .then(res => {
             return res
         })
