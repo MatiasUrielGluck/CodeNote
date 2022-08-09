@@ -121,7 +121,7 @@
           </div>
         </div>
         <div class="right-col">
-          <i class="fa-solid fa-circle-user fa-xl"></i>
+          <i class="fa-solid fa-circle-user fa-xl" @click="logout()"></i>
         </div>
       </div>
 
@@ -135,6 +135,7 @@ import store from '@/store'
 // @ is an alias to /src
 import foldersApi from '../services/foldersApi'
 import notesApi from '../services/notesApi'
+import usersApi from '../services/usersApi'
 
 export default {
   name: 'HomeView',
@@ -159,7 +160,7 @@ export default {
       selectedDeleteItemType: '',
     }
   },
-
+  
   async beforeMount() {
     let res = await foldersApi.getFolders()
     store.state.folders = res.data
@@ -336,6 +337,11 @@ export default {
         this.notes.push(newNote.data)
         this.toggleNoteWindow()
       }
+    },
+
+    logout() {
+      usersApi.logout()
+      this.$router.push('/login')
     }
   }
 }

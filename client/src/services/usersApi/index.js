@@ -22,4 +22,14 @@ export default {
             return err
         })
     },
+
+    logout: async function() {
+        return await Api().get('/logout')
+        .then(res => {
+            return res
+        })
+        .catch(err => {
+            return err
+        })
+    },
 }
