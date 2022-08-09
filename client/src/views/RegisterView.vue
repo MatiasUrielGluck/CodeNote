@@ -3,20 +3,17 @@
     <div class="internal-window">
       <div class="content">
         <h1>CodeNote Signup</h1>
-        
-        <form id="registerForm" action="" method="POST" @submit.prevent="submitForm()">
-          <div class="input-container">
-            <div class="input">
-              <input type="text" placeholder="Enter your email" v-model="emailValue">
-              <p class="error" :class="emailClass">{{emailErrorMsg}}</p>
-            </div>
-             <div class="input">
-              <input type="password" placeholder="Enter your password" v-model="passwordValue">
-              <p class="error" :class="passwordClass">{{passwordErrorMsg}}</p>
-            </div>
-            <button type="submit">Signup</button>
+        <div class="input-container">
+          <div class="input">
+            <input type="text" name="email" id="email" placeholder="Enter your email" v-model="emailValue">
+            <p class="error" :class="emailClass">{{emailErrorMsg}}</p>
           </div>
-        </form>
+            <div class="input">
+            <input type="password" name="password" id="password" placeholder="Enter your password" v-model="passwordValue">
+            <p class="error" :class="passwordClass">{{passwordErrorMsg}}</p>
+          </div>
+          <button @click="submit">Signup</button>
+        </div>
         <p>Already have an account? <router-link to="/login">Login</router-link></p>
       </div>
     </div>
@@ -24,6 +21,8 @@
 </template>
 
 <script>
+import usersApi from '../services/usersApi'
+
 export default {
   name: 'RegisterView',
 
@@ -67,7 +66,7 @@ export default {
   },
 
   methods: {
-    submitForm() {
+    async submit() {
       let emailOk = false
       let passwordOk = false
 
@@ -86,8 +85,15 @@ export default {
       }
 
       if (emailOk && passwordOk) {
-        document.querySelector('#registerForm').submit()
-        return true
+        const res = await usersApi.createUser({
+          email: this.emailValue,
+          password: this.passwordValue
+        })
+
+        alert(res)
+        if (res === 'Successfully registered') {
+          this.$router.push('/login')
+        }
       }
     }
   }

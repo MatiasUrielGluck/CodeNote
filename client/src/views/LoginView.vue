@@ -3,19 +3,16 @@
     <div class="internal-window">
       <div class="content">
         <h1>CodeNote Login</h1>
-        
-        <form id="loginForm" action="" method="POST" @submit.prevent="submitForm()">
-          <div class="input-container">
-            <div class="input">
-              <input type="text" placeholder="Enter your email" v-model="emailValue">
-            </div>
-             <div class="input">
-              <input type="password" placeholder="Enter your password" v-model="passwordValue">
-            </div>
-            <p class="error" :class="showError ? 'show' : ''">Incorrect email or password</p>
-            <button type="submit">Signup</button>
+        <div class="input-container">
+          <div class="input">
+            <input type="text" name="username" id="username" placeholder="Enter your email" v-model="emailValue">
           </div>
-        </form>
+            <div class="input">
+            <input type="password" name="password" id="password" placeholder="Enter your password" v-model="passwordValue">
+          </div>
+          <p class="error" :class="showError ? 'show' : ''">Incorrect email or password</p>
+          <button @click="submit">Login</button>
+        </div>
         <p>Don't have an account? <router-link to="/register">Signup</router-link></p>
       </div>
     </div>
@@ -23,6 +20,8 @@
 </template>
 
 <script>
+import usersApi from '../services/usersApi'
+
 export default {
   name: 'LoginView',
 
@@ -30,13 +29,24 @@ export default {
     return {
       emailValue: '',
       passwordValue: '',
-      showError: '',
+      showError: false,
     }
   },
 
   methods: {
-    submitForm() {
+    async submit() {
+      const res = await usersApi.login({
+        username: this.emailValue,
+        password: this.passwordValue
+      })
 
+      if (!res.data.success) {
+        this.showError = true
+        return
+      } else {
+        this.showError = false
+        this.$router.push('/')
+      }
     }
   }
 }
