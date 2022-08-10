@@ -46,14 +46,17 @@ module.exports = {
     },
 
     async updateNote(id, name, content) {
-        return noteModel.findByIdAndUpdate(id, {
+        console.log(typeof(name), typeof(content))
+        return await noteModel.findByIdAndUpdate(id, {
             name: name,
             content: content
         }, { new: true})
         .then(res => {
+            console.log(res)
             return res
         })
         .catch(err => {
+            console.log(err)
             return err
         })
     },

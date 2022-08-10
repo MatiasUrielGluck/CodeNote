@@ -29,5 +29,15 @@ export default {
         .catch(err => {
             return err
         })
+    },
+
+    updateNote: async function(folderId, noteId, body) {
+        return await Api().patch('/' + folderId + '/notes/' + noteId, body)
+        .then(res => {
+            return res
+        })
+        .catch(err => {
+            return err
+        })
     }
 }

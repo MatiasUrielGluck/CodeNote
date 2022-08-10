@@ -239,8 +239,15 @@ export default {
       this.action('foreColor', false, color)
     },
 
-    updateHTML() {
+    async updateHTML() {
       this.selectedContent = document.querySelector('#editor').innerHTML
+      this.selectedNote.content = this.selectedContent
+      
+      // Save changes to database
+      await notesApi.updateNote(this.selectedNote.parentFolder, this.selectedNote._id, {
+        name: this.selectedNote.name,
+        content: this.selectedContent
+      })
     },
 
     // Window actions
