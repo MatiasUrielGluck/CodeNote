@@ -116,7 +116,7 @@
             </select>
           </div>
           <div class="tools-section">
-            <button class="no-style"><i class="fa-solid fa-code"></i></button>
+            <button class="no-style"><i class="fa-solid fa-code" @click="insertCode()"></i></button>
           </div>
 
           <div class="tools-section">
@@ -402,6 +402,11 @@ export default {
         this.notes.push(newNote.data)
         this.toggleNoteWindow()
       }
+    },
+
+    insertCode() {
+      alert('Working on it :)')
+      // document.querySelector('#editor').innerHTML += ''
     },
 
     logout() {
