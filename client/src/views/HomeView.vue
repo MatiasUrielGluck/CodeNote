@@ -1,6 +1,6 @@
 <template>
   <div class="external-window">
-     <!-- Delete window -->
+    <!-- Delete window -->
     <div class="internal-window" :class="hiddenDeleteWindow ? 'hidden-window' : ''" v-if="selectedDeleteItem">
       <div class="delete-window">
         <h1>Delete {{selectedDeleteItemType}}</h1>
@@ -8,6 +8,19 @@
         <div class="action-container">
           <button @click="deleteItem()">Delete</button>
           <button @click="toggleDeleteWindow()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rename item window -->
+    <div class="internal-window" :class="hiddenRenameWindow ? 'hidden-window' : ''">
+      <div class="new-folder-window">
+        <h1>Rename {{selectedType}}</h1>
+        <input type="text" :placeholder="`Enter the new ${selectedType} name here`" v-model="newItemName">
+        <p :class="showError">{{noteWindowError}}</p>
+        <div class="action-container">
+          <button @click="renameItem()">Rename</button>
+          <button @click="toggleRenameWindow()">Cancel</button>
         </div>
       </div>
     </div>
@@ -52,7 +65,7 @@
           </div>
         </div>
         <div class="items-container" v-for="(folder, index) in folders" :key="index">
-          <div class="item" :class="selectedFolder === folder? 'selected': ''" @click="selectNote(folder)">
+          <div class="item" :class="selectedFolder === folder? 'selected': ''" @click="selectNote(folder)" @dblclick="toggleRenameWindow('folder')">
             <p>{{folder.name}}</p>
           </div>
         </div>
@@ -72,7 +85,7 @@
           </div>
         </div>
        <div class="items-container" v-for="(note, index) in notes" :key="index">
-          <div class="item" :class="selectedNote === note? 'selected': ''" @click="selectContent(note)">
+          <div class="item" :class="selectedNote === note? 'selected': ''" @click="selectContent(note)" @dblclick="toggleRenameWindow('note')">
             <p>{{note.name}}</p>
           </div>
         </div>
@@ -158,6 +171,10 @@ export default {
       hiddenDeleteWindow: 'hidden-window',
       selectedDeleteItem: null,
       selectedDeleteItemType: '',
+      hiddenRenameWindow: 'hidden-window',
+      selectedType: '',
+      newItemName: '',
+
     }
   },
   
@@ -287,6 +304,23 @@ export default {
       }
     },
 
+    toggleRenameWindow(type) {
+      if (this.hiddenRenameWindow === '') {
+        this.hiddenRenameWindow = 'hidden-window'
+        this.newItemName = ''
+        this.selectedType = ''
+      } else {
+        this.hiddenRenameWindow = ''
+        if (type === 'folder') {
+          this.newItemName = this.selectedFolder.name
+        } else if (type === 'note') {
+          this.newItemName = this.selectedNote.name
+        }
+
+        this.selectedType = type
+      }
+    },
+
     async deleteItem() {
       if (this.selectedDeleteItemType === 'folder') {
         await foldersApi.deleteFolder(this.selectedDeleteItem._id)
@@ -294,6 +328,7 @@ export default {
       } else if (this.selectedDeleteItemType === 'note') {
         await notesApi.deleteNote(this.selectedFolder._id, this.selectedDeleteItem._id)
 
+        document.querySelector('#editor').innerHTML = ''
         // seleccionar la carpeta y la nota nuevamente
         await this.getData()
         this.selectedFolder = this.folders.find(folder => folder.name === this.selectedFolder.name)
@@ -304,6 +339,29 @@ export default {
 
       this.getData()
       this.toggleDeleteWindow()
+    },
+
+    async renameItem() {
+      if (this.selectedType === 'folder') {
+        await foldersApi.updateFolder(this.selectedFolder._id, {
+          name: this.newItemName
+        })
+
+        // Update states
+        this.selectedFolder.name = this.newItemName
+
+      } else if (this.selectedType === 'note') {
+        await notesApi.updateNote(this.selectedFolder._id, this.selectedNote._id, {
+          name: this.newItemName,
+          content: this.selectedNote.content
+        })
+        
+        // Update states
+        this.selectedNote.name = this.newItemName
+      }
+
+      this.getData()
+      this.toggleRenameWindow()
     },
 
     async createFolder() {

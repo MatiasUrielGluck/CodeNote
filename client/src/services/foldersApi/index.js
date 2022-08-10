@@ -29,5 +29,15 @@ export default {
         .catch(err => {
             return err
         })
+    },
+
+    updateFolder: async function(folderId, body) {
+        return await Api().patch('/' + folderId, body)
+        .then(res => {
+            return res
+        })
+        .catch(err => {
+            return err
+        })
     }
 }
