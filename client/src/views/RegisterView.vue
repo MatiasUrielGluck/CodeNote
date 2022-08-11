@@ -104,6 +104,10 @@ export default {
 <style scoped>
 @import '../../public/styles.css';
 
+h1, p, input, button {
+  font-family: 'Poppins', sans-serif;
+}
+
 .external-window {
   height: 100vh;
   width: 100vw;

@@ -3,7 +3,7 @@
     <!-- Code Editor window -->
     <div class="internal-window" :class="hiddenCodeWindow ? 'hidden-window' : ''">
       <div class="code-editor-window">
-        <h1>Code Editor</h1>
+        <h1>Code Editor (under development)</h1>
         <select name="lang" id="lang" v-model="lang">
           <option value="js">JavaScript</option>
           <option value="py">Python</option>
@@ -149,7 +149,14 @@
             <button class="no-style" @click="action('insertUnorderedList', false, null)"><i class="fa-solid fa-list"></i></button>
             <button class="no-style" @click="action('insertOrderedList', false, null)"><i class="fa-solid fa-list-ol"></i></button>
             <button class="no-style" @click="addCheckbox()"><i class="fa-solid fa-square-check"></i></button>
-            <button class="no-style"><i class="fa-solid fa-image"></i></button>
+          </div>
+          <div class="tools-section status-container" @click="toggleStatus">
+            <i class="fa-solid fa-triangle-exclamation" style="color: red;" v-if="saving"></i>
+            <i class="fa-solid fa-circle-check" style="color: green;" v-if="!saving"></i>
+            <div class="status" :class="hideStatus ? 'hide-status' : ''">
+              <p v-if="saving">Status: <span style="color: red;">not saved</span></p>
+              <p v-if="!saving">Status: <span style="color: green;">saved</span></p>
+            </div>
           </div>
         </div>
         <div class="right-col">
@@ -177,6 +184,8 @@ export default {
   
   data: function() {
     return {
+      hideStatus: '',
+      saving: false,
       panel: '',
       content: '',
       showCloseBtn: false,
@@ -281,17 +290,30 @@ export default {
     },
 
     async updateHTML() {
+      if (!this.selectedNote) {
+        this.saving = true
+        return
+      }
       this.selectedContent = document.querySelector('#editor').innerHTML
       this.selectedNote.content = this.selectedContent
-      
+      this.saving = true
       // Save changes to database
       await notesApi.updateNote(this.selectedNote.parentFolder, this.selectedNote._id, {
         name: this.selectedNote.name,
         content: this.selectedContent
       })
+      this.saving = false
     },
 
     // Window actions
+
+    toggleStatus() {
+      if (this.hideStatus === '') {
+        this.hideStatus = 'hide-status'
+      } else {
+        this.hideStatus = ''
+      }
+    },
 
     toggleCodeWindow() {
       if (this.hiddenCodeWindow === '') {
@@ -437,9 +459,14 @@ export default {
       }
     },
 
+    editCode(id) {
+      console.log(id)
+    },
+
     createCode() {
       // store.state.codeEditorText
       document.querySelector('#editor').innerHTML += `<pre><code class="language-js">${store.state.codeEditorText}</code></pre>`
+      this.toggleCodeWindow()
     },
 
     insertCode() {
@@ -581,6 +608,25 @@ i {
 }
 
 /* Content Col */
+.status-container {
+  position: relative;
+}
+
+.status {
+  position: absolute;
+  background: var(--secondary-color);
+  white-space: nowrap;
+  padding: 0.2rem;
+  border-radius: 12px;
+  left: -4rem;
+  transform: translateY(0%) scale(0%);
+  transition: all 0.3s ease;
+}
+
+.hide-status {
+  transform: translateY(80%) scale(100%);
+}
+
 .content-col .toolbox {
   display: flex;
   justify-content: space-between;
@@ -613,7 +659,8 @@ i {
 
 .editor {
   padding: 2rem;
-  height: 100%
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
 }
 
 .editor:focus {
@@ -764,7 +811,13 @@ i {
 
 /* Medium devices */
 
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1120px) {
+  .toolbox .center-col {
+    gap: 0.5rem;
+  }
+}
+
+@media only screen and (max-width: 1070px) {
   * {
     background: var(--background-color);
   }
@@ -793,9 +846,9 @@ i {
   }
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 780px) {
   .toolbox .center-col {
-    gap: 1rem;
+    gap: 0.5rem;
   }
 }
 
