@@ -1,8 +1,8 @@
 <template>
-    <div style="height: 200px;">
-        <textarea placeholder="Enter code" id="editing" spellcheck="false" @input="update(this.value); sync_scroll(this);" @scroll="sync_scroll(this);" @keydown="check_tab(this, event);"></textarea>
+    <div id="code-editor">
+        <textarea v-model="userInput" placeholder="Enter code" id="editing" spellcheck="false" @input="update(userInput); sync_scroll();" @scroll="sync_scroll();" @keydown="check_tab($event);"></textarea>
         <pre id="highlighting" aria-hidden="true">
-            <code class="language-js" id="highlighting-content">
+            <code :class="`language-${lang}`" id="highlighting-content">
                 
             </code>
         </pre>
@@ -10,13 +10,39 @@
 </template>
 
 <script>
+
+import Prism from 'prismjs';
+import "prismjs/themes/prism-tomorrow.css";
+import store from '@/store'
+
+// Remember to import here all the langs!!! #TODO
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-python';
+
+
 export default {
     name: 'CodeEditor',
 
+    props: {
+      lang: String,
+    },
+
+    data: function() {
+      return {
+        userInput: '',
+      }
+    },
+
     methods: {
+        updateSharedState(newValue) {
+          store.state.codeEditorText = newValue
+        },
+
         update(text) {
             let result_element = document.querySelector("#highlighting-content");
-            // Handle final newlines (see article)
+            // Handle final newlines
             if(text[text.length-1] == "\n") {
             text += " ";
             }
@@ -24,18 +50,21 @@ export default {
             result_element.innerHTML = text.replace(new RegExp("&", "g"), "&amp;").replace(new RegExp("<", "g"), "&lt;"); /* Global RegExp */
             // Syntax Highlight
             Prism.highlightElement(result_element);
+            this.updateSharedState(result_element.innerHTML)
         },
 
-        sync_scroll(element) {
+        sync_scroll() {
             /* Scroll result to scroll coords of event - sync with textarea */
             let result_element = document.querySelector("#highlighting");
+            let element = document.querySelector("#editing");
             // Get and set x and y
             result_element.scrollTop = element.scrollTop;
             result_element.scrollLeft = element.scrollLeft;
         },
 
-        check_tab(element, event) {
-            let code = element.value;
+        check_tab(event) {
+            let code = this.userInput;
+            let element = document.querySelector("#editing");
             if(event.key == "Tab") {
                 /* Tab key pressed */
                 event.preventDefault(); // stop normal
@@ -54,22 +83,35 @@ export default {
 </script>
 
 <style scoped>
+#code-editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 #editing, #highlighting {
-    /* Both elements need the same text and space styling so they are directly on top of each other */
     margin: 10px;
     padding: 10px;
     border: 0;
-    width: calc(100% - 32px);
-    height: 150px;
-  }
-  #editing, #highlighting, #highlighting * {
-    /* Also add text styles to highlighing tokens */
-    font-size: 15pt;
-    font-family: monospace;
-    line-height: 20pt;
-    tab-size: 2;
+    width: 98%;
+    /* height: 150px; */
+    height: 100%;
   }
   
+  #editing, #highlighting  {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 1.125rem;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  }
   
   #editing, #highlighting {
     /* In the same place */
@@ -79,8 +121,8 @@ export default {
   }
   
   #editing {
-    top: 0.5rem;
-    left: 0.5rem;
+    top: 0rem;
+    left: 0rem;
   }
 
   #editing:focus {
@@ -114,15 +156,5 @@ export default {
   /* No resize on textarea */
   #editing {
     resize: none;
-  }
-  
-  /* Paragraphs; First Image */
-  * {
-    font-family: "Fira Code", monospace;
-  }
-  p code {
-    border-radius: 2px;
-    background-color: #eee;
-    color: #111;
   }
 </style>

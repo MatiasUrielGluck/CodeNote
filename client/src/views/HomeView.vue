@@ -1,5 +1,24 @@
 <template>
   <div class="external-window">
+    <!-- Code Editor window -->
+    <div class="internal-window" :class="hiddenCodeWindow ? 'hidden-window' : ''">
+      <div class="code-editor-window">
+        <h1>Code Editor</h1>
+        <select name="lang" id="lang" v-model="lang">
+          <option value="js">JavaScript</option>
+          <option value="py">Python</option>
+          <option value="c">C</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+        </select>
+        <div class="editor"><code-editor :lang="lang"/></div>
+        <div class="action-container">
+          <button @click="createCode()">Save</button>
+          <button @click="toggleCodeWindow()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Delete window -->
     <div class="internal-window" :class="hiddenDeleteWindow ? 'hidden-window' : ''" v-if="selectedDeleteItem">
       <div class="delete-window">
@@ -139,6 +158,7 @@
       </div>
 
       <div class="editor" id="editor" contenteditable="true" @input="updateHTML" @click="changeColor()"></div>
+      
     </div>
   </div>
 </template>
@@ -149,8 +169,10 @@ import store from '@/store'
 import foldersApi from '../services/foldersApi'
 import notesApi from '../services/notesApi'
 import usersApi from '../services/usersApi'
+import CodeEditor from '../components/CodeEditor.vue'
 
 export default {
+  components: { CodeEditor },
   name: 'HomeView',
   
   data: function() {
@@ -174,7 +196,9 @@ export default {
       hiddenRenameWindow: 'hidden-window',
       selectedType: '',
       newItemName: '',
-
+      hiddenCodeWindow: 'hidden-window',
+      codeInput: '',
+      lang: '',
     }
   },
   
@@ -268,6 +292,15 @@ export default {
     },
 
     // Window actions
+
+    toggleCodeWindow() {
+      if (this.hiddenCodeWindow === '') {
+        this.hiddenCodeWindow = 'hidden-window'
+        this.codeInput = ''
+      } else {
+        this.hiddenCodeWindow = ''
+      }
+    },
 
     toggleDeleteWindow(type) {
       if (this.hiddenDeleteWindow === '') {
@@ -404,9 +437,13 @@ export default {
       }
     },
 
+    createCode() {
+      // store.state.codeEditorText
+      document.querySelector('#editor').innerHTML += `<pre><code class="language-js">${store.state.codeEditorText}</code></pre>`
+    },
+
     insertCode() {
-      alert('Working on it :)')
-      // document.querySelector('#editor').innerHTML += ''
+      this.toggleCodeWindow()
     },
 
     logout() {
@@ -420,6 +457,10 @@ export default {
 <style scoped>
 @import '../../public/styles.css';
 
+h1, h2, h3, h4, h5, h6, p {
+  font-family: 'Poppins', sans-serif;
+}
+
 i {
   cursor: pointer;
   color: var(--secondary-color);
@@ -429,6 +470,7 @@ i {
   width: 100vw;
   height: 100vh;
   display: flex;
+  background: var(--background-color);
 }
 
 .panel-col {
@@ -446,6 +488,7 @@ i {
 }
 
 .content-col {
+  position: relative;
   display: flex;
   flex-flow: column nowrap;
   height: 100vh;
@@ -642,6 +685,25 @@ i {
   background: rgba(157, 157, 157, 1);
 }
 
+.code-editor-window {
+  padding: 2rem;
+  position: absolute;
+  z-index: 5;
+  width: 80vw;
+  height: 90vh;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  background: rgba(157, 157, 157, 1);
+  border-radius: 16px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.code-editor-window .editor {
+  width: 100%;
+  height: 80%;
+}
+
 .new-folder-window {
   padding: 2rem;
   position: absolute;
@@ -654,8 +716,6 @@ i {
   align-items: center;
   background: rgba(157, 157, 157, 1);
   border-radius: 16px;
-  /* box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; */
-  /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
@@ -684,7 +744,7 @@ i {
   opacity: 100%;
 }
 
-.new-folder-window button, .delete-window button {
+.new-folder-window button, .delete-window button, .code-editor-window button {
   cursor: pointer;
   padding: 0.4rem 0.8rem;
   margin: 0 0.4rem;
@@ -705,6 +765,10 @@ i {
 /* Medium devices */
 
 @media only screen and (max-width: 1050px) {
+  * {
+    background: var(--background-color);
+  }
+
   .panel-col {
     position: absolute;
     z-index: 1;
