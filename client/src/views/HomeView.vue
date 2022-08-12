@@ -661,6 +661,7 @@ i {
   padding: 2rem;
   height: 100%;
   font-family: 'Poppins', sans-serif;
+  overflow: scroll;
 }
 
 .editor:focus {
