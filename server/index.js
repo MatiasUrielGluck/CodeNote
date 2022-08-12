@@ -1,8 +1,9 @@
+require('dotenv').config({ path: 'development.env' })
+
 const express = require('express')
 const app = express()
-const config = require('./config')
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/CodeNote');
+mongoose.connect(process.env.DB_URL);
 const cors = require('cors')
 const session = require('express-session')
 const passport = require('passport')
@@ -38,6 +39,9 @@ app.use('/users', usersRoutes)
 app.use('/folders', foldersRoutes)
 
 // ====================
-app.listen(config.port, () => {
-    console.log(`Listening on port ${config.port}...`)
+const host = process.env.HOST || '0.0.0.0'
+const port = process.env.PORT || 3000
+
+app.listen(port, host, () => {
+    console.log(`Listening on port ${port}...`)
 })
