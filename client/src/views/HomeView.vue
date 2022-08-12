@@ -83,9 +83,11 @@
             <i class="fa-solid fa-trash-can" @click="toggleDeleteWindow('folder')"></i>
           </div>
         </div>
-        <div class="items-container" v-for="(folder, index) in folders" :key="index">
-          <div class="item" :class="selectedFolder === folder? 'selected': ''" @click="selectNote(folder)" @dblclick="toggleRenameWindow('folder')">
-            <p>{{folder.name}}</p>
+        <div class="items-container">
+          <div v-for="(folder, index) in folders" :key="index">
+            <div class="item" :class="selectedFolder === folder? 'selected': ''" @click="selectNote(folder)" @dblclick="toggleRenameWindow('folder')">
+              <p>{{folder.name}}</p>
+            </div>
           </div>
         </div>
         <div class="new-box" @click="toggleFolderWindow()">
@@ -103,11 +105,13 @@
             <i class="fa-solid fa-trash-can" @click="toggleDeleteWindow('note')"></i>
           </div>
         </div>
-       <div class="items-container" v-for="(note, index) in notes" :key="index">
-          <div class="item" :class="selectedNote === note? 'selected': ''" @click="selectContent(note)" @dblclick="toggleRenameWindow('note')">
-            <p>{{note.name}}</p>
+       <div class="items-container">
+         <div v-for="(note, index) in notes" :key="index">
+            <div class="item" :class="selectedNote === note? 'selected': ''" @click="selectContent(note)" @dblclick="toggleRenameWindow('note')">
+              <p>{{note.name}}</p>
+            </div>
           </div>
-        </div>
+       </div>
         <div class="new-box"  @click="toggleNoteWindow()">
           <p>New note</p>
         </div>
@@ -655,6 +659,11 @@ i {
 .toolbox .center-col .tools-section {
   display: flex;
   gap: 0.5rem;
+}
+
+.items-container {
+  height: 80vh;
+  overflow: scroll;
 }
 
 .editor {
