@@ -1,6 +1,6 @@
 # CodeNote (under development)
 
-[Live deployed preview of the application.](https://codenote-app.netlify.app/)
+[Live deployed preview of the application.](https://codenote-app.netlify.app)
 
 You can contact me with your suggestions and feedback to my email, [matiasugluck@gmail.com](mailto:matiasugluck@gmail.com).
 

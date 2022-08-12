@@ -42,6 +42,10 @@ app.use('/folders', foldersRoutes)
 const host = process.env.HOST || '0.0.0.0'
 const port = process.env.PORT || 3000
 
+app.get('/', (req, res) => {
+    res.send('CodeNote Server')
+})
+
 app.listen(port, host, () => {
     console.log(`Listening on port ${port}...`)
 })
